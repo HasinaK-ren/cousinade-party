@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#242044">
+  <title>Cousinade Party</title>
+  <style>
+    :root{--ink:#242044;--ink2:#39345f;--gold:#f6c453;--pink:#ff719a;--bg:#f6f5fb;--card:#fff;--muted:#77758d;--line:#e9e6f2;--green:#18794e}
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+    button,input,select,textarea{font:inherit} button{cursor:pointer;border:0;border-radius:12px;padding:11px 15px;font-weight:750;background:var(--ink);color:white}
+    button.secondary{background:#efedf7;color:var(--ink)} button.gold{background:var(--gold);color:var(--ink)} button.danger{background:#b42318}
+    button:disabled{opacity:.5;cursor:not-allowed} input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px;padding:11px;background:white;color:var(--ink)}
+    label{display:block;font-size:.9rem;font-weight:700;margin:10px 0 5px} .wrap{max-width:1040px;margin:auto;padding:16px}
+    header{background:var(--ink);color:white;padding:22px 0 25px;border-radius:0 0 26px 26px}
+    .brand{display:flex;align-items:center;gap:12px}.logo{display:grid;place-items:center;background:var(--gold);color:var(--ink);width:48px;height:48px;border-radius:15px;font-size:25px}
+    h1{font-size:clamp(1.35rem,4vw,2rem);margin:0} header p{margin:3px 0 0;color:#dcd9ef}
+    nav{display:flex;gap:8px;overflow:auto;padding:14px 0} nav button{white-space:nowrap} nav button.active{background:var(--gold);color:var(--ink)}
+    .grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px}.col8{grid-column:span 8}.col4{grid-column:span 4}.col6{grid-column:span 6}.full{grid-column:1/-1}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 5px 18px #24204408}
+    h2{font-size:1.12rem;margin:0 0 12px} h3{font-size:1rem;margin:0 0 7px}.muted{color:var(--muted);font-size:.92rem}.hero{background:linear-gradient(135deg,#39345f,#242044);color:white}.hero .muted{color:#dcd9ef}
+    .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.stat{padding:13px;background:#ffffff12;border-radius:13px}.stat strong{display:block;font-size:1.65rem;color:var(--gold)}
+    .list{display:grid;gap:9px}.item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}.item:last-child{border:0}
+    .rank{width:35px;height:35px;border-radius:11px;background:#f0edf9;display:grid;place-items:center;font-weight:900;flex-shrink:0}
+    .grow{flex:1;min-width:0}.points{font-weight:850;white-space:nowrap}.pill{display:inline-block;border-radius:99px;padding:3px 9px;background:#f0edf9;font-size:.78rem;font-weight:800}.pill.pending{background:#fff1c9}.pill.ok{background:#dff7e8;color:var(--green)}
+    .stack{display:grid;gap:10px}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.row button{flex:0 0 auto}
+    .question{font-weight:800;margin:12px 0}.option{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--line);padding:10px;border-radius:11px;margin:7px 0;cursor:pointer}.option input{width:auto;margin-top:5px}
+    .notice{padding:12px 14px;border-radius:12px;background:#fff1c9;color:#684b00;margin:10px 0}.success{background:#dff7e8;color:#125b3b}.error{background:#fde7e7;color:#8a1c1c}
+    .hidden{display:none!important} .footer{text-align:center;padding:24px 8px;color:var(--muted);font-size:.82rem}
+    .auth{max-width:490px;margin:20px auto}.small{font-size:.82rem}.divider{height:1px;background:var(--line);margin:14px 0}
+    @media(max-width:720px){.col8,.col4,.col6{grid-column:1/-1}.wrap{padding:12px}.card{padding:15px}.stats{grid-template-columns:repeat(2,1fr)}}
+  </style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="brand"><div class="logo">🏆</div><div><h1>Cousinade Party</h1><p>Le championnat officiel de la famille</p></div></div>
+</div></header>
+<main class="wrap">
+  <section id="setupNotice" class="notice hidden"></section>
+  <section id="authView" class="card auth">
+    <h2>🎉 Entre dans la compétition</h2>
+    <p class="muted">Choisis ton pseudo et saisis le code familial. Pas besoin de créer un compte e-mail.</p>
+    <form id="joinForm">
+      <label for="familyCode">Code familial</label><input id="familyCode" required autocomplete="off" placeholder="Le code transmis par l'admin">
+      <label for="nickname">Ton pseudo</label><input id="nickname" required minlength="2" maxlength="24" autocomplete="nickname" placeholder="Ex. Cousin Kevin">
+      <button type="submit" style="width:100%;margin-top:14px">Rejoindre le championnat</button>
+    </form>
+    <p class="muted small">Le pseudo doit être unique. Évite de saisir des informations personnelles sensibles.</p>
+    <div id="authMsg" role="status"></div>
+  </section>
+
+  <section id="appView" class="hidden">
+    <div class="row" style="margin:10px 0 0"><div><strong id="hello">Salut !</strong><div class="muted" id="seasonLabel">Saison familiale</div></div><button class="secondary" id="logoutBtn">Changer de pseudo</button></div>
+    <nav aria-label="Navigation">
+      <button class="active" data-tab="home">🏠 Accueil</button><button data-tab="quiz">🧠 Quiz</button><button data-tab="challenges">🔥 Défis</button><button data-tab="ranking">🏆 Classement</button><button data-tab="admin" id="adminNav" class="hidden">🛠 Admin</button>
+    </nav>
+    <section id="tab-home" class="tab grid">
+      <div class="card hero col8"><h2>La guerre des cousins !</h2><p class="muted">Joue, gagne des XP et décroche ton titre de légende familiale.</p><div class="stats"><div class="stat"><span>Ton score</span><strong id="myScore">0 XP</strong></div><div class="stat"><span>Ta position</span><strong id="myRank">—</strong></div></div></div>
+      <div class="card col4"><h2>🎖️ Ton titre</h2><h3 id="myTitle">Nouvelle recrue</h3><p class="muted" id="myBadges">Chaque point compte !</p></div>
+      <div class="card col6"><h2>⚡ À faire maintenant</h2><p class="muted">Réponds à un quiz ou participe à un défi en attente.</p><button data-goto="quiz">Jouer au quiz</button></div>
+      <div class="card col6"><h2>🥇 Le podium</h2><div id="podium" class="list"></div></div>
+    </section>
+    <section id="tab-quiz" class="tab hidden grid"><div class="card full"><h2>🧠 Quiz familial</h2><p class="muted">Chaque quiz ne rapporte des points qu'une seule fois par joueur.</p><div id="quizList" class="list"></div></div><div id="quizPlay" class="card full hidden"></div></section>
+    <section id="tab-challenges" class="tab hidden grid"><div class="card full"><h2>🔥 Défis de la famille</h2><p class="muted">Soumets ta participation. L'administrateur validera les points.</p><div id="challengeList" class="list"></div></div></section>
+    <section id="tab-ranking" class="tab hidden grid"><div class="card full"><h2>🏆 Classement général</h2><div id="rankingList" class="list"></div></div></section>
+    <section id="tab-admin" class="tab hidden grid"><div class="card full"><h2>🛠️ Panneau d'administration</h2><p class="muted">Créer des défis et attribuer des points aux participations. Les quiz se corrigent automatiquement.</p></div>
+      <div class="card col6"><h2>Créer un défi</h2><form id="challengeForm"><label>Titre</label><input name="title" required maxlength="100"><label>Description</label><textarea name="description" required maxlength="1000" rows="3"></textarea><label>Points accordés à la validation</label><input name="points" type="number" min="0" max="500" value="30" required><button style="margin-top:12px">Publier le défi</button></form></div>
+      <div class="card col6"><h2>Créer un quiz</h2><form id="quizForm"><label>Titre du quiz</label><input name="title" required maxlength="100"><label>Question</label><textarea name="question" required maxlength="500" rows="2"></textarea><label>Réponse A</label><input name="a" required maxlength="160"><label>Réponse B</label><input name="b" required maxlength="160"><label>Réponse C</label><input name="c" required maxlength="160"><label>Réponse D</label><input name="d" required maxlength="160"><label>Bonne réponse</label><select name="correct"><option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option></select><label>Points pour bonne réponse</label><input name="points" type="number" min="1" max="100" value="20" required><button style="margin-top:12px">Créer le quiz</button></form></div>
+      <div class="card full"><h2>Participations à valider</h2><div id="pendingList" class="list"></div></div>
+      <div class="card full"><h2>Créer un compte administrateur</h2><p class="muted">Après avoir rejoint le groupe, copie ton identifiant technique affiché ci-dessous et passe-le au rôle admin dans Supabase (instructions dans le README).</p><p class="small" id="userIdText">Identifiant : non connecté</p><button class="secondary" id="copyIdBtn">Copier mon identifiant</button></div>
+    </section>
+    <div id="appMsg" role="status"></div>
+  </section>
+  <div class="footer">Cousinade Party · Fait pour la famille ❤️ · Application indépendante, non affiliée à Meta.</div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/*
+  CONFIGURATION : coller ici l'URL et la clé publique/anon de son projet Supabase.
+  Ne jamais mettre une clé service_role dans ce fichier.
+*/
+const SUPABASE_URL = "https://ierafddwkyvhqkqqkbqm.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_EZS7qx8P9ZJGD7pZcZNcgA_WHdelRuF";
+const FAMILY_CODE = "COUSINS2026"; // code d'accès de démonstration : à remplacer
+const supabaseReady = SUPABASE_URL.startsWith("https://") && !SUPABASE_URL.includes("COLLER_ICI") && !SUPABASE_ANON_KEY.includes("COLLER_ICI");
+const $ = (id) => document.getElementById(id);
+let db = null, player = null, family = null, currentQuiz = null;
+const escapeHtml = (s="") => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function message(target, text, type="notice"){ const el=$(target); el.className=text ? "notice "+type : ""; el.textContent=text||""; }
+function points(n){ return `${Number(n)||0} XP`; }
+function titleFor(n){ if(n>=500)return "👑 Légende familiale"; if(n>=300)return "🥇 Champion·ne"; if(n>=150)return "⚡ Challenger"; if(n>=50)return "🎯 Joueur confirmé"; return "🌱 Nouvelle recrue"; }
+function setup(){ $("setupNotice").textContent="Configuration requise : crée ton projet Supabase, exécute schema.sql, puis renseigne SUPABASE_URL et SUPABASE_ANON_KEY dans index.html. Consulte le README."; $("setupNotice").classList.remove("hidden"); }
+async function rpc(name,args={}){ const {data,error}=await db.rpc(name,args); if(error) throw error; return data; }
+async function loadFamily(){
+  const {data,error}=await db.from("families").select("id,name").eq("access_code",FAMILY_CODE).maybeSingle();
+  if(error) throw error; if(!data) throw new Error("Code familial non reconnu. Vérifie le code dans la configuration."); family=data;
+}
+async function enterApp(){
+  $("authView").classList.add("hidden"); $("appView").classList.remove("hidden");
+  $("hello").textContent=`Salut, ${player.nickname} ! 👋`; $("userIdText").textContent=`Identifiant : ${player.user_id}`;
+  $("adminNav").classList.toggle("hidden",player.role!=="admin");
+  $("tab-admin").classList.toggle("hidden",player.role!=="admin");
+  await refreshAll();
+}
+async function join(e){
+  e.preventDefault(); message("authMsg","Vérification du code familial…");
+  if(!$("familyCode").value.trim() || $("familyCode").value.trim()!==FAMILY_CODE){ message("authMsg","Code familial incorrect. Vérifie auprès de l'administrateur.","error"); return; }
+  const nickname=$("nickname").value.trim();
+  if(nickname.length<2){ message("authMsg","Choisis un pseudo d'au moins 2 caractères.","error"); return; }
+  try{
+    const {data:sessionData,error:authError}=await db.auth.getSession();
+    if(authError) throw authError;
+    if(!sessionData.session){ const {error}=await db.auth.signInAnonymously(); if(error) throw error; }
+    const {data:userData,error:userError}=await db.auth.getUser(); if(userError) throw userError;
+    const result=await rpc("join_family",{p_access_code:FAMILY_CODE,p_nickname:nickname});
+    player=result;
+    message("authMsg","");
+    await enterApp();
+  }catch(err){ message("authMsg",err.message||"Impossible de rejoindre le championnat.","error"); }
+}
+async function refreshAll(){
+  try{
+    const [profileRes,scoreRes,quizRes,challengeRes,submissionRes]=await Promise.all([
+      db.from("profiles").select("user_id,nickname,role").eq("user_id",player.user_id).single(),
+      db.from("leaderboard").select("user_id,nickname,total_points"),
+      db.from("quizzes").select("id,title,question,options,points,active,created_at").eq("family_id",family.id).eq("active",true).order("created_at",{ascending:false}),
+      db.from("challenges").select("id,title,description,points,active,created_at").eq("family_id",family.id).eq("active",true).order("created_at",{ascending:false}),
+      db.from("challenge_submissions").select("id,challenge_id,status,awarded_points").eq("user_id",player.user_id)
+    ]);
+    if(profileRes.error) throw profileRes.error;
+    player={...player,...profileRes.data};
+    const scores=scoreRes.data||[], quizzes=quizRes.data||[], challenges=challengeRes.data||[], submissions=submissionRes.data||[];
+    const mine=scores.find(x=>x.user_id===player.user_id);
+    const sorted=[...scores].sort((a,b)=>b.total_points-a.total_points);
+    const rank=sorted.findIndex(x=>x.user_id===player.user_id)+1;
+    $("myScore").textContent=points(mine?.total_points||0); $("myRank").textContent=rank?`#${rank}`:"—";
+    $("myTitle").textContent=titleFor(mine?.total_points||0); $("myBadges").textContent=`${(mine?.total_points||0)>=500?"Badge Légende débloqué !":"Continue pour débloquer de nouveaux titres."}`;
+    $("podium").innerHTML=sorted.slice(0,3).map((p,i)=>`<div class="item"><div class="rank">${["🥇","🥈","🥉"][i]}</div><div class="grow"><strong>${escapeHtml(p.nickname)}</strong></div><div class="points">${points(p.total_points)}</div></div>`).join("")||'<p class="muted">Pas encore de score.</p>';
+    $("rankingList").innerHTML=sorted.map((p,i)=>`<div class="item"><div class="rank">${i+1}</div><div class="grow"><strong>${escapeHtml(p.nickname)}</strong>${p.user_id===player.user_id?' <span class="pill">Toi</span>':''}<div class="muted">${escapeHtml(titleFor(p.total_points))}</div></div><div class="points">${points(p.total_points)}</div></div>`).join("")||'<p class="muted">Le classement apparaîtra dès les premières participations.</p>';
+    const attempts=await db.from("quiz_attempts").select("quiz_id,score").eq("user_id",player.user_id);
+    if(attempts.error) throw attempts.error;
+    const played=new Map((attempts.data||[]).map(a=>[a.quiz_id,a.score]));
+    $("quizList").innerHTML=quizzes.map(q=>`<div class="item"><div class="grow"><strong>${escapeHtml(q.title)}</strong><div class="muted">${escapeHtml(q.question)}</div><div class="muted">${q.points} XP · ${played.has(q.id)?`Déjà joué : ${played.get(q.id)} XP`:"À jouer"}</div></div><button ${played.has(q.id)?"disabled":""} data-play="${q.id}">${played.has(q.id)?"Terminé":"Jouer"}</button></div>`).join("")||'<p class="muted">Aucun quiz pour le moment.</p>';
+    document.querySelectorAll("[data-play]").forEach(b=>b.addEventListener("click",()=>playQuiz(quizzes.find(q=>q.id===b.dataset.play))));
+    $("challengeList").innerHTML=challenges.map(c=>{const sub=submissions.find(s=>s.challenge_id===c.id);return `<div class="item"><div class="grow"><strong>${escapeHtml(c.title)}</strong><div>${escapeHtml(c.description)}</div><div class="muted">${c.points} XP si validé ${sub?`· Statut : ${escapeHtml(sub.status)}`:""}</div></div>${sub?`<span class="pill ${sub.status==="approved"?"ok":"pending"}">${sub.status==="approved"?"Validé":sub.status==="pending"?"En attente":"Refusé"}</span>`:`<button data-submit="${c.id}">Participer</button>`}</div>`}).join("")||'<p class="muted">Aucun défi pour le moment.</p>';
+    document.querySelectorAll("[data-submit]").forEach(b=>b.addEventListener("click",()=>submitChallenge(b.dataset.submit)));
+    if(player.role==="admin") await loadPending();
+  }catch(err){ message("appMsg",err.message||"Erreur de chargement.","error"); }
+}
+function playQuiz(q){
+  if(!q)return; currentQuiz=q;
+  const options=Array.isArray(q.options)?q.options:[];
+  $("quizPlay").classList.remove("hidden");
+  $("quizPlay").innerHTML=`<h2>🧠 ${escapeHtml(q.title)}</h2><p class="question">${escapeHtml(q.question)}</p><form id="answerForm">${options.map((o,i)=>`<label class="option"><input type="radio" name="answer" value="${i}" required><span>${escapeHtml(o)}</span></label>`).join("")}<button style="margin-top:10px">Valider ma réponse</button></form><div id="answerMsg"></div>`;
+  $("answerForm").addEventListener("submit",async e=>{e.preventDefault();const value=Number(new FormData(e.currentTarget).get("answer"));const btn=e.currentTarget.querySelector("button");btn.disabled=true;try{const result=await rpc("submit_quiz_answer",{p_quiz_id:q.id,p_answer_index:value});message("answerMsg",result.correct?`Bravo ! Tu gagnes ${result.score} XP 🎉`:`Pas cette fois ! Tu gagnes ${result.score} XP.`,"success");await refreshAll();}catch(err){message("answerMsg",err.message||"Impossible d'enregistrer la réponse.","error");btn.disabled=false;}});
+  $("quizPlay").scrollIntoView({behavior:"smooth",block:"start"});
+}
+async function submitChallenge(id){
+  const note=prompt("Décris ta participation (ou indique où l'administrateur peut la voir dans le groupe Facebook) :");
+  if(note===null)return;
+  try{await rpc("submit_challenge",{p_challenge_id:id,p_note:note.trim()});message("appMsg","Participation envoyée à l'administrateur !","success");await refreshAll();}
+  catch(err){message("appMsg",err.message||"Impossible d'envoyer la participation.","error");}
+}
+async function loadPending(){
+  const {data,error}=await db.from("challenge_submissions").select("id,note,created_at,profiles(nickname),challenges(title,points)").eq("status","pending").order("created_at",{ascending:true});
+  if(error) throw error;
+  $("pendingList").innerHTML=(data||[]).map(s=>`<div class="item"><div class="grow"><strong>${escapeHtml(s.profiles?.nickname||"Joueur")}</strong> · ${escapeHtml(s.challenges?.title||"Défi")}<div class="muted">${escapeHtml(s.note||"Aucune note")}</div><div class="muted">${s.challenges?.points||0} XP proposés</div></div><button data-approve="${s.id}" class="gold">Valider</button><button data-reject="${s.id}" class="secondary">Refuser</button></div>`).join("")||'<p class="muted">Aucune participation en attente.</p>';
+  document.querySelectorAll("[data-approve]").forEach(b=>b.addEventListener("click",async()=>{try{await rpc("review_submission",{p_submission_id:b.dataset.approve,p_approve:true});await refreshAll();message("appMsg","Participation validée et points attribués.","success");}catch(e){message("appMsg",e.message,"error");}}));
+  document.querySelectorAll("[data-reject]").forEach(b=>b.addEventListener("click",async()=>{try{await rpc("review_submission",{p_submission_id:b.dataset.reject,p_approve:false});await refreshAll();}catch(e){message("appMsg",e.message,"error");}}));
+}
+document.querySelectorAll("nav [data-tab]").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
+document.querySelectorAll("[data-goto]").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.goto)));
+function showTab(tab){document.querySelectorAll(".tab").forEach(x=>x.classList.add("hidden"));$("tab-"+tab).classList.remove("hidden");document.querySelectorAll("nav [data-tab]").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));}
+$("joinForm").addEventListener("submit",join);
+$("logoutBtn").addEventListener("click",async()=>{await db.auth.signOut();player=null;$("appView").classList.add("hidden");$("authView").classList.remove("hidden");});
+$("copyIdBtn").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(player.user_id);message("appMsg","Identifiant copié.","success");}catch(e){message("appMsg","Copie impossible. Sélectionne l'identifiant affiché.","error");}});
+$("challengeForm").addEventListener("submit",async e=>{e.preventDefault();const f=new FormData(e.currentTarget);try{await rpc("admin_create_challenge",{p_title:f.get("title"),p_description:f.get("description"),p_points:Number(f.get("points"))});e.currentTarget.reset();message("appMsg","Défi publié !","success");await refreshAll();}catch(err){message("appMsg",err.message,"error");}});
+$("quizForm").addEventListener("submit",async e=>{e.preventDefault();const f=new FormData(e.currentTarget);try{await rpc("admin_create_quiz",{p_title:f.get("title"),p_question:f.get("question"),p_options:[f.get("a"),f.get("b"),f.get("c"),f.get("d")],p_correct_index:Number(f.get("correct")),p_points:Number(f.get("points"))});e.currentTarget.reset();message("appMsg","Quiz créé !","success");await refreshAll();}catch(err){message("appMsg",err.message||"Erreur de création du quiz.","error");}});
+(async function init(){
+  if(!supabaseReady){setup();return;}
+  db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+  try{
+    const {data,error}=await db.auth.getSession();if(error)throw error;
+    if(data.session){
+      const {data:u,error:ue}=await db.auth.getUser();if(ue)throw ue;
+      const {data:p,error:pe}=await db.from("profiles").select("user_id,nickname,role,family_id").eq("user_id",u.user.id).maybeSingle();
+      if(pe)throw pe;
+      if(p){player=p;family={id:p.family_id};await enterApp();}
+    }
+  }catch(e){message("authMsg",e.message||"Erreur de connexion.","error");}
+})();
+</script>
+</body>
+</html>
