@@ -111,7 +111,7 @@ async function signInWithFacebook(){
   message("authMsg","Redirection vers Facebook…");
   const {error}=await db.auth.signInWithOAuth({
     provider:"facebook",
-    options:{redirectTo:"https://hasinak-ren.github.io/cousinade-party/"}
+    options:{scopes:"public_profile",redirectTo:"https://hasinak-ren.github.io/cousinade-party/"}
   });
   if(error) message("authMsg",error.message||"Connexion Facebook impossible.","error");
 }
