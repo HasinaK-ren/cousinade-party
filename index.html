@@ -113,9 +113,10 @@ async function join(e){
     if(!sessionData.session){ const {error}=await db.auth.signInAnonymously(); if(error) throw error; }
     const {data:userData,error:userError}=await db.auth.getUser(); if(userError) throw userError;
     const result=await rpc("join_family",{p_access_code:FAMILY_CODE,p_nickname:nickname});
-    player=result;
-    message("authMsg","");
-    await enterApp();
+player=result;
+family={id:result.family_id};
+message("authMsg","");
+await enterApp();
   }catch(err){ message("authMsg",err.message||"Impossible de rejoindre le championnat.","error"); }
 }
 async function refreshAll(){
